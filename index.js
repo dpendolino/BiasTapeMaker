@@ -171,10 +171,12 @@ function drawSlide(parent) {
     parent.appendChild(foldLines[SIDE]);
   }
 
+  var side
+
   var cutLines={}
   cutLines[LEFT]={};
   cutLines[RIGHT]={}
-  for (var SIDE in cutLines) {
+  for (const SIDE in cutLines) {
     //console.log(SIDE);
     //console.log(guides.v[SIDE])
     cutLines[SIDE]=vLine({x:{side:SIDE,guide:FOLDOUT},y1:{index:slideStart},y2:{index:slideEnd}});
@@ -196,7 +198,9 @@ function drawSlide(parent) {
   parent.appendChild(eRect);
 
   var cutSlideEnd = {LEFT:{},RIGHT:{}};
-  for (side in cutSlideEnd) {
+  for (const SIDE in cutSlideEnd) {
+    console.log("SIDE: ",SIDE);
+    console.log("cutSlideEnd[SIDE]: ",cutSlideEnd[SIDE]);
     cutSlideEnd[SIDE]=hLine(
       {x1:{SIDE:SIDE,GUIDE:FOLD},
       x2:{SIDE:SIDE,GUIDE:FOLD},

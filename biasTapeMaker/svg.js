@@ -64,10 +64,16 @@ export function hLine(p) {
   else yC=guides.h[p.y.index].u;
   if (p.x1===undefined) x1c=0;
   else {
+    let SIDE=p.x1.SIDE;
+    if (p.x1.SIDE==LEFT) SIDE=LEFT;
+    else if (p.x1.SIDE==RIGHT) SIDE=RIGHT;
     console.log("p.x1:  ",p.x1)
-    console.log("p.x1[SIDE]:  ",p.x1[SIDE])
-    console.log("p.x1.GUIDE:  ",p.x1.GUIDE)
-    x1c=guides.v[p.x1.SIDE][p.x1.GUIDE].u;
+    //console.log("p.x1.SIDE:  ",p.x1.SIDE)
+    //console.log("p.x1.GUIDE:  ",p.x1.GUIDE)
+    console.log("guides.v[SIDE]: ",guides.v[SIDE]);
+    console.log("guides.v[SIDE][p.x1.GUIDE]: ",guides.v[SIDE][p.x1.GUIDE]);
+    //console.log("guides.v[LEFT]: ",guides.v[LEFT][p.x1.GUIDE]);
+    x1c=guides.v[SIDE][p.x1.GUIDE].u;
   }
   if (p.x2===undefined) x2c=params.page.width.u;
   else x2c=guides.v[p.x2.SIDE][p.x2.GUIDE].u;

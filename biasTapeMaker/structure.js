@@ -56,9 +56,7 @@ function vGuides(params) {
   this[RIGHT][STRIPINNER]=new unitObj(this[RIGHT][STRIP].raw-inner.raw);
   this[RIGHT][FOLD]=new unitObj(offset.raw+finishedWidth.raw/2);
   this[RIGHT][FOLDINNER]=new unitObj(this[RIGHT][FOLD].raw-inner.raw);
-
   this[RIGHT][FOLDOUT]=new unitObj(this[RIGHT][STRIP].raw+finishedWidth.raw/2-inner.raw);
-
   this[RIGHT].array=[this[RIGHT].edge,this[RIGHT][STRIP],this[RIGHT][STRIPINNER],this[RIGHT][FOLD],this[RIGHT][FOLDINNER],this[RIGHT][FOLDOUT]];
   this[RIGHT].count=this[RIGHT].array.length;
   this[RIGHT][EDGE].name=EDGE;
