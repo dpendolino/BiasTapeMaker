@@ -1,0 +1,14 @@
+export const LEFT="left";
+export const RIGHT="right";
+export const CENTER="center";
+export const FOLD="fold";
+export const FOLDINNER="foldInner";
+export const FOLDOUT="foldOut";
+export const STRIP="strip";
+export const STRIPINNER="stripInner";
+export const EDGE="edge";
+export const SLIDE="slide";
+export const GUIDE="guide";
+export const BASE="base";
+export const SIDE="side";
+export const INDEX="index";
