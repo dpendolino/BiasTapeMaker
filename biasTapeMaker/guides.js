@@ -5,8 +5,16 @@ import { params } from '../index.js';
 
 const X="x";
 const Y="y";
+export var printUsage={on:true};
 
-function Guides() {
+export function Guides() {
+  if (printUsage.on && !printUsage.Guides) {
+    console.log("--USAGE: Guides()--",
+      "\n  Guides.ax(X) -> xGuides",
+      "\n  Guides.ax(Y)->yGuides()",
+      "\n  Guides.maxIndex->max y index");
+    printUsage.Guides=true;
+  }
     var o = {
       ax(axis) {
         if (axis==X) return this[X];
@@ -25,6 +33,13 @@ function Guides() {
     return o;
 }
 function yGuides() {
+  if (printUsage.on && !printUsage.yGuides) {
+    console.log("--USAGE: yGuides()--",
+      "\n  yGuides.index(i) -> yGuideObj at index i",
+      "\n    (0=top; max=bottom)",
+      "\n  yGuides.maxIndex->max y index");
+    printUsage.yGuides=true;
+  }
   var o = {
     axis:Y,
     index(i) {
@@ -47,8 +62,13 @@ function yGuides() {
   }
   return o;
 }
-
 function xGuides() {
+  if (printUsage.on && !printUsage.xGuides) {
+    console.log("--USAGE: xGuides()--",
+      "\n  xGuides.side(SIDE) -> xGuideSide object for SIDE",
+      "\n    (LEFT, RIGHT, CENTER)");
+    printUsage.xGuides=true;
+  }
   var o = {
     axis:X,
     side(s) {
@@ -68,8 +88,13 @@ function xGuides() {
   o[CENTER]=new xGuideSide(CENTER);
   return o;
 }
-
 function xGuideSide(side) {
+  if (printUsage.on && !printUsage.xGuideSide) {
+    console.log("--USAGE: xGuideSide()--",
+      "\n  xGuideSide.ref(REF) -> xGuideObj for REF",
+      "\n    (FOLD, FOLDINNER, STRIP, CENTER, etc.)");
+    printUsage.xGuideSide=true;
+  }
   var s;
   if (side==LEFT) s=LEFT;
   else if (side==RIGHT) s=RIGHT;
@@ -122,7 +147,6 @@ function xGuideSide(side) {
   else return false;
   return o;
 }
-
 /*
 usage examples
 
@@ -154,16 +178,29 @@ GuideObj.below(unitObj) -> new GuideObj relative
 */
 
 function GuideObj(p) {
+  if (printUsage.on && !printUsage.GuideObj) {
+    console.log("--USAGE: GuideObj()--",
+      "\n  GuideObj.raw -> measurement in raw units (e.g. inches)",
+      "\n  GuideObj.u -> measurement in svg coords (e.g. px)",
+      "\n  GuideObj.axis, .side, .index -> name attributes",
+      "\n  GuideObj.name(prefix,suffix) -> a string that can be used for ids");
+    printUsage.GuideObj=true;
+  }
     var o = {
-        name: null,
+        name(prefix,suffix) {
+          var str="";
+          if (prefix) str+=prefix;
+          if (this.axis==X) str+=this.side+"-"+this.ref;
+          else str+=this.axis+"-"+this.index;
+          if (suffix) str+=suffix;
+          return str;
+        },
         raw: null,
         u: null,
         axis: null,
         side: null,
         index: null,
-        setName(iName) {
-            this.name=iName;
-        },
+        ref: null,
         setRaw(iRaw) {
             this.raw=Math.round(iRaw);
             this.u=Math.round(params.units.to(iRaw));
@@ -220,7 +257,7 @@ function GuideObj(p) {
       if (this.axis==Y) this.index=p.index;
       else delete p.index;
     }
-    for (var arg in p) console.log("Unhandled parameter: ",arg);
+    for (var arg in p) console.log("Unhandled parameter at GuideObj: ",arg,p[arg]);
     return o;
 }
 function xGuideObj(p) {
@@ -248,16 +285,17 @@ function yGuideObj(p) {
     delete o.inset;
     delete o.outset;
     delete o.side;
+    delete o.ref;
     return o;
 }
 
-var obj=new Guides();
+//var obj=new Guides();
 //console.log("obj: ",obj);
 //console.log("obj.ax(X): ",obj.ax(X));
 //console.log("obj.ax(X).side(LEFT): ",obj.ax(X).side(LEFT));
 //console.log("obj.ax(X).side(LEFT).ref(FOLD): ",obj.ax(X).side(LEFT).ref(FOLD));
 //console.log("obj.ax(Y)",obj.ax(Y));
 //console.log("obj.ax(Y).index(32)",obj.ax(Y).index(32));
-console.log("obj.ax(Y).index(obj.maxIndex))",obj.ax(Y).index(obj.maxIndex));
+//console.log("obj.ax(Y).index(obj.maxIndex))",obj.ax(Y).index(obj.maxIndex));
 //console.log(obj.ax(Y).maxIndex)
 //console.log("obj.ax(Y).index(44)",obj.ax(Y).index(44));

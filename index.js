@@ -1,22 +1,13 @@
-import {Guides,Sections} from './biasTapeMaker/structure.js';
+//import {Guides,Sections} from './biasTapeMaker/structure.js';
+import {Sections} from './biasTapeMaker/structure.js';
 import {unitObj} from './biasTapeMaker/utils.js';
 import {svg,group,rect,hLine,vLine,path,guideRect, pathCmdList} from './biasTapeMaker/svg.js';
-import {GUIDE,LEFT,RIGHT,CENTER,STRIP,STRIPINNER,FOLD,FOLDINNER,SLIDE,FOLDOUT,BASE,SIDE,INDEX} from './biasTapeMaker/const.js';
-
-/*
-export const LEFT="left";
-export const RIGHT="right";
-export const CENTER="center";
-export const FOLD="fold";
-export const FOLDINNER="foldInner";
-export const FOLDOUT="foldOut";
-export const STRIP="strip";
-export const STRIPINNER="stripInner";
-export const EDGE="edge";
-export const SLIDE="slide";
-export const GUIDE="guide";
-export const BASE="base";
-*/
+import {
+  LEFT,RIGHT,CENTER,SIDES,
+  FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
+  SLIDE,GUIDE,BASE,SECTIONS,
+  SIDE,INDEX,X,Y} from './biasTapeMaker/const.js';
+import {Guides,printUsage} from './biasTapeMaker/guides.js';
 
 // PARAMETERS
 var page, stripWidth, finishedWidth, 
@@ -63,13 +54,16 @@ export var params = {
     hGuideSep:hGuideSep,
     offset:offset,
     units:units};
+var slideStart = 5;
+var slideEnd = 19;
+var guideEnd = 30;
 
 var p = document.createElement("p")
 p.innerHTML = "This is a test.";
 document.body.appendChild(p);
 
 export var guides = new Guides();
-guides.calculate(params);
+guides.calculate();
 
 var svgDrawing = svg(page.width.u,page.height.u);
 document.body.appendChild(svgDrawing);
@@ -85,33 +79,55 @@ for (let i=0; i<sections.count; i++) {
 
   var frame = rect(0,0,baseWidth.u,page.height.u,sect.fill);
   frame.setAttribute("id",sect.name+"-frame")
-  //console.log(frame);
   groupObj.appendChild(frame);
 
-  for (let j=0; j<guides.v.count; j++) {
-    var thisSide=guides.v.array[j].name;
-    for (let k=0; k<guides.v.array[j].count; k++) {
-      var thisGuide=guides.v.array[j].array[k].name;
-      var guide = vLine({x:{side:thisSide,guide:thisGuide}});
-      guide.setAttribute("id",(thisSide+"-"+thisGuide));
-      guide.setAttribute("stroke",(guideStroke));
-      groupObj.append(guide);
+  for (const i in SIDES) {
+    let SIDE=SIDES[i];
+    for (const j in REFS) {
+      let REF=REFS[j];
+      if (guides.ax(X).side(SIDE).ref(REF)) {
+        var guide = vLine({x:{side:SIDE,guide:REF}});
+        guide.setAttribute("id",(SIDE+"-"+REF));
+        guide.setAttribute("stroke",(guideStroke));
+        groupObj.append(guide);
+      }
     }
   }
 }
-var slideStart = 5;
-  var slideEnd = 19;
-  var guideEnd = 30;
-  
+
+/* --usage examples)
+  var aRect = guideRect({
+    x1:{side:LEFT,guide:STRIP},
+    y1:{index:1},
+    x2:{side:RIGHT,guide:STRIP},
+    y2:{index:2}});
+  var aRect = guideRect({
+    x1:{side:LEFT,guide:STRIP},
+    y1:{index:1},
+    w:stripWidth,
+    h:hGuideSep});
+*/
+
 function drawGuide(parent) {
-  var aRect = rect(guides.v.left.strip.u,guides.h[1].u,stripWidth.u,hGuideSep.u,cutoutFill);
+  //var aRect = rect(guides.v.left.strip.u,guides.h[1].u,stripWidth.u,hGuideSep.u,cutoutFill);
+  var aRect = guideRect({
+    x1:{side:LEFT,guide:STRIP},
+    y1:{index:1},
+    w:stripWidth,
+    h:hGuideSep
+    });
+  setCutAttributes(aRect);
   aRect.setAttribute("id","guide-cutout-1");
-  aRect.setAttribute("stroke",black);
   parent.appendChild(aRect);
 
-  var bRect = rect(guides.v.left.strip.u,guides.h[3].u,stripWidth.u,hGuideSep.u,cutoutFill);
+  var bRect = guideRect({
+    x1:{side:LEFT,guide:STRIP},
+    y1:{index:3},
+    w:stripWidth,
+    h:hGuideSep
+  });
+  setCutAttributes(bRect);
   bRect.setAttribute("id","guide-cutout-2");
-  bRect.setAttribute("stroke",black);
   parent.appendChild(bRect);
 
   var d;
@@ -132,18 +148,21 @@ function drawGuide(parent) {
     {cmd:"z"}
   ]);
   var cPath = path(d,GUIDE+"-cutout-3");
-  cPath.setAttribute("fill",cutoutFill);
-  cPath.setAttribute("stroke",black);
+  setCutAttributes(cPath);
   parent.appendChild(cPath);
   
-  //console.log(guides.h.length);
-  //console.log(guides.h[44])
-  var dRect = rect(guides.v[LEFT][FOLD].u,
+  var dRect = guideRect({
+    x1:{side:LEFT,guide:FOLD},
+    y1:{index:guides.maxIndex-1},
+    w:finishedWidth,
+    h:hGuideSep
+  });
+  /*var dRect = rect(guides.v[LEFT][FOLD].u,
     guides.h[guides.h.length-2].u,
     2*foldWidth.u,
     hGuideSep.u,
-    cutoutFill);
-  dRect.setAttribute("stroke",cutStroke);
+    cutoutFill);*/
+  setCutAttributes(dRect);
   dRect.setAttribute("id",GUIDE+"-cutout-4")
   parent.appendChild(dRect);
 
@@ -200,7 +219,7 @@ function drawSlide(parent) {
   parent.appendChild(eRect);
 
   var cutSlideEnd = {LEFT:{},RIGHT:{}};
-  for (side in cutSlideEnd) {
+  for (var side in cutSlideEnd) {
     cutSlideEnd[SIDE]=hLine(
       {x1:{SIDE:SIDE,GUIDE:FOLD},
       x2:{SIDE:SIDE,GUIDE:FOLD},
@@ -210,11 +229,11 @@ function drawSlide(parent) {
     parent.appendChild(cutSlideEnd[SIDE]);
   }
 }
-//drawSlide(svgDrawing.getElementById(SLIDE));
+drawSlide(svgDrawing.getElementById(SLIDE));
  
 function setCutAttributes(svgObj) {
   svgObj.setAttribute("stroke",cutStroke);
-  svgObj.setAttribute("strokeWidth",strokeWidth);
+  svgObj.setAttribute("strokeWidth",cutStrokeWidth);
 }
 
  

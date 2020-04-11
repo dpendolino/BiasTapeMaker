@@ -1,6 +1,10 @@
 export {};
 import { params, guides } from '../index.js';
-import {GUIDE,LEFT,RIGHT,CENTER,STRIP,STRIPINNER,FOLD,FOLDINNER,SLIDE,FOLDOUT,BASE,SIDE,INDEX} from './const.js';
+import {
+  LEFT,RIGHT,CENTER,SIDES,
+  FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
+  SLIDE,GUIDE,BASE,SECTIONS,
+  SIDE,INDEX,X,Y} from './const.js';
 
 var NS="http://www.w3.org/2000/svg";
 const svgElem = {
@@ -45,9 +49,10 @@ export function line(x1,y1,x2,y2,stroke){
 export function vLine(p) {
   var xC, y1c, y2c;
   if (p.x===undefined) console.log("Missing required parameter: x");
-  console.log(p);
+  //console.log(p);
   if (p.x.u) x=p.x.u;
-  else xC=guides.v[p.x.side][p.x.guide].u;
+  //else xC=guides.v[p.x.side][p.x.guide].u;
+  else xC=guides.ax(X).side(p.x.side).ref(p.x.guide).u;
   if (p.y1===undefined) y1c=0;
   else y1c=guides.h[p.y1.index].u;
   if (p.y2===undefined) y2c=params.page.height.u;
@@ -103,15 +108,13 @@ export function guideRect(p){
   }
   x1=p.x1;
   y1=p.y1
-  x1computed=guides.v[x1.side][x1.guide].u;
-  y1computed=guides.h[y1.index].u;
-  //console.log("x1c: ("+x1computed+"); y1c: ("+y1computed+")");
-
+  x1computed=guides.ax(X).side(x1.side).ref(x1.guide).u;
+  y1computed=guides.ax(Y).index(y1.index).u;
   if (p.x2 && p.y2) {
     x2=p.x2;
     y2=p.y2;
-    wComputed = guides.v[x2.side][x2.guide].u-x1computed;
-    hComputed = guides.h[y2.index].u-y1computed;
+    wComputed = guides.ax(X).side(x2.side).ref(x2.guide).u-x1computed;
+    hComputed = guides.ax(Y).index(y2.index).u-y1computed;
   } else if (p.w && p.h) {
     wComputed=p.w.u;
     hComputed=p.h.u;
@@ -196,11 +199,9 @@ export function pathCmd(p) {
         replComputed=p[repl].u;
       }
       else {
-        //console.log("Provided object",p[repl]," to ",type," path.");
-        //console.log("Here's your input:", p[repl])
         var gId=p[repl];
-        if (repl=="x" || repl=="dx") replComputed=guides.v[gId.side][gId.guide].u;
-        else if (repl=="y" || repl=="dy") replComputed=guides.h[gId.index].u;
+        if (repl=="x" || repl=="dx") replComputed=guides.ax(X).side(gId.side).ref(gId.guide).u;
+        else if (repl=="y" || repl=="dy") replComputed=guides.ax(Y).index(gId.index).u;
         else console.log("Not sure what to do with this. Param not in x, y, dx, dy.")
       }
     } 
