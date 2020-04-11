@@ -1,2 +1,2 @@
 language = "html"
-run = "./biasTapeMaker/guides.js"
+run = "index.html"

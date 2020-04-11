@@ -27,6 +27,9 @@ export var units={
     label:"inch",
     to:function(meas) {
         return(meas*this.x); 
+    },
+    from:function(meas) {
+      return(meas/this.x);
     }
 };
 const cutoutFill="#ddd";
@@ -58,7 +61,8 @@ export var params = {
     panelWidth:panelWidth,
     baseWidth:baseWidth,
     hGuideSep:hGuideSep,
-    offset:offset};
+    offset:offset,
+    units:units};
 
 var p = document.createElement("p")
 p.innerHTML = "This is a test.";
@@ -206,7 +210,7 @@ function drawSlide(parent) {
     parent.appendChild(cutSlideEnd[SIDE]);
   }
 }
-drawSlide(svgDrawing.getElementById(SLIDE));
+//drawSlide(svgDrawing.getElementById(SLIDE));
  
 function setCutAttributes(svgObj) {
   svgObj.setAttribute("stroke",cutStroke);
