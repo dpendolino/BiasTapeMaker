@@ -16,6 +16,9 @@ export const SLIDE="slide";
 export const GUIDE="guide";
 export const BASE="base";
 export const SECTIONS=[SLIDE,GUIDE,BASE];
+//SVG ATTRIBUTES
+export const FILL="fill";
+export const STYLE="style";
 //OTHER
 export const SIDE="side";
 export const INDEX="index";

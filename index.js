@@ -1,7 +1,7 @@
 //import {Guides,Sections} from './biasTapeMaker/structure.js';
 import {Sections} from './structure.js';
-import {unitObj} from './utils.js';
-import {svg,group,rect,hLine,vLine,path,guideRect, pathCmdList} from './svg.js';
+import {unitObj,meas} from './utils.js';
+import {svg,group,rect,hLine,vLine,path,guideRect, pathCmdList,text} from './svg.js';
 import {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
@@ -241,17 +241,59 @@ function splitterTabs(parent,yInd) {
 
 function addScale(parent) {
 	var inches={};
-	for (let i=0;i<=2;i+=1/16) inches[i]=new xGuideObj({raw:i});
+	for (let i=0;i<=2;i+=1/16) inches[i]=new unitObj(i);
 	var cms={};
-	for (let i=0;i<=5;i+=.1) cms[i]=new xGuideObj({raw:i/2.54});
-  
+	for (let i=0;i<=5;i+=.1) cms[Math.round(i*10)/10]=new meas(i/2.54,Math.floor(10*units.x*i/2.54)/10);
+  //console.log(inches);
+  console.log({x1:inches[0].u,x2:inches[2].u,y1:0,y2:hGuideSep.u});
+  //console.log(cms);
+  console.log({x1:cms[0].u,
+    x2:cms[5].u,
+    y1:0,
+    y2:-hGuideSep.u});
   var scale = group("scale");
-  var inchScale=rect({x1:inches[0],x2:inches[2],y1:0,y2:hGuideSep});
-  var cmScale=rect({x1:cms[0],x2:cms[5],y1:0,y2:-hGuideSep});
-  //var d = pathCmdList([
-  //  {cmd:"",x:{side:,ref:},y:{index}}
-  //]};
+  scale.setAttribute("transform","translate(60,10) rotate(90)");
+  var inchScale=rect(inches[0].u,0,inches[2].u-inches[0].u,hGuideSep.u,"#fff");
+  console.log("inchScale",inchScale);
+  var cmScale=rect(cms[0].u,hGuideSep.u,cms[5].u-cms[0].u,hGuideSep.u,"#fff");
+  inchScale.setAttribute("stroke",black);
+  cmScale.setAttribute("stroke",black);
   scale.appendChild(inchScale);
-  scale.appendChild(inchScale);
+  scale.appendChild(cmScale);
+  var d="";
+  const inchMarkings={1:.5,2:.4,4:.3,8:.2,16:.15};
+  for (let j in inches) {
+    if (j==Math.floor(j)) {
+      scale.appendChild(text(j,j+"-in",{x:inches[j].u,y:.8*hGuideSep.u,fill:"#000",style:"font-size:80%"}));
+    }
+    for (let k in inchMarkings) {
+      if (j*k==Math.floor(j*k)) {//integer
+        d+=pathCmdList([
+          {cmd:"M",x:inches[j].u,y:0},
+          {cmd:"v",dy:inchMarkings[k]*hGuideSep.u}
+        ]);
+        break;
+      }
+    }
+  }
+  const cmMarkings={1:.5,2:.3,10:.2};
+  for (let j in cms) {
+    if (j==Math.floor(j)) {
+      scale.appendChild(text(j,j+"-cm",{x:cms[j].u,y:1.5*hGuideSep.u,fill:"#000",style:"font-size:80%"}));
+    }
+    for (let k in cmMarkings) {
+      if (j*k==Math.floor(j*k)) {//integer
+        d+=pathCmdList([
+          {cmd:"M",x:cms[j].u,y:2*hGuideSep.u},
+          {cmd:"v",dy:-cmMarkings[k]*hGuideSep.u}
+        ]);
+        break;
+      }
+    }
+  }
+  var scalePath = path(d,"scale-markings");
+  scalePath.setAttribute("stroke","#000");
   parent.appendChild(scale);
+  scale.appendChild(scalePath);
 }
+addScale(svgDrawing);

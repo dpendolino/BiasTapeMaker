@@ -4,6 +4,7 @@ import {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
   SLIDE,GUIDE,BASE,SECTIONS,
+  FILL,STYLE,
   SIDE,INDEX,X,Y} from './const.js';
 
 var NS="http://www.w3.org/2000/svg";
@@ -11,7 +12,8 @@ const svgElem = {
   RECT:"rect",
   PATH:"path",
   LINE:"line",
-  GROUP:"g"
+  GROUP:"g",
+  TEXT:"text"
 }
 
 
@@ -76,8 +78,6 @@ export function hLine(p) {
 	return line(x1c,yC,x2c,yC);
 }
 
-
-
 export function group(name){
  var SVGObj= document.createElementNS(NS,svgElem.GROUP);
  SVGObj.setAttribute("id",name);
@@ -87,7 +87,6 @@ export function group(name){
 export function path(d,name) {
   var SVGObj = document.createElementNS(NS,svgElem.PATH);
   SVGObj.setAttribute("d",d);
-
   SVGObj.addToPath = function(pathCommands) {
     this.d+=pathCommands;
   }
@@ -187,7 +186,7 @@ export function pathCmd(p) {
     if (p[repl]===undefined) console.log("Missing conditionally required parameter. Path command ",p.cmd," requires parameter ",repl,".");
     var replComputed;
     //console.log(repl,":  ",p[repl]);
-    if (typeof p[repl]==="number") replComputed=p[repl];
+    if (typeof p[repl]==="number"||typeof p[repl]==="string") replComputed=p[repl];
     else if (typeof p[repl]==="object") {
       if (p[repl].u && type==cmdType.REL) {
         //console.log("Provided unit object ",p[repl]," to relative path.");
@@ -209,4 +208,16 @@ export function pathCmd(p) {
     rStr=rStr.replace(req[repl],replComputed);
   }
   return rStr;
+}
+
+export function text(text,id,p) { 
+  var SVGObj= document.createElementNS(NS, svgElem.TEXT);
+  SVGObj.setAttribute("id",id);
+  SVGObj.innerHTML=text;
+  for (let attr in p) {
+    if (attr==FILL||attr==X||attr==Y||attr==STYLE) {
+      SVGObj.setAttribute(attr,p[attr]);
+    }
+  }
+  return SVGObj;
 }

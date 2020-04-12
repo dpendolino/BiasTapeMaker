@@ -7,7 +7,7 @@ function debug(msg){
 };
 
 
-function meas(raw,u) {
+export function meas(raw,u) {
   this.raw=raw;
   this.u=u;
 }
