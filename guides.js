@@ -1,7 +1,7 @@
 import {LEFT,RIGHT,CENTER} from './const.js';
 import {FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER} from './const.js';
 //import {LEFT,RIGHT,CENTER} from './const.js';
-import { params } from '../index.js';
+import { params } from './index.js';
 
 const X="x";
 const Y="y";
@@ -112,23 +112,24 @@ function xGuideSide(side) {
       var inner=params.inner.u;
       var stripWidth=params.stripWidth.u;
       if (this.side==LEFT) {
-        this[FOLDOUT]=new xGuideObj({u:cOff-3*finWidth/2,side:this.side});
+        this[FOLDOUT]=new xGuideObj({u:cOff-3*finWidth+inner,side:this.side});
         this[STRIP]=new xGuideObj({u:cOff-stripWidth/2,side:this.side});
-        this[STRIPINNER]=new xGuideObj({u:cOff-stripWidth/2-inner,side:this.side});
-        this[FOLD]=new xGuideObj({u:cOff-finWidth/2,side:this.side});
-        this[FOLDINNER]=new xGuideObj({u:cOff-finWidth/2-inner,side:this.side});
+        this[STRIPINNER]=new xGuideObj({u:cOff-stripWidth/2+inner,side:this.side});
+        this[FOLD]=new xGuideObj({u:cOff-finWidth,side:this.side});
+        this[FOLDINNER]=new xGuideObj({u:cOff-finWidth+inner,side:this.side});
       }
       else if (this.side==RIGHT) {
-        this[FOLDOUT]=new xGuideObj({u:cOff-+3*finWidth/2,side:this.side});
+        this[FOLDOUT]=new xGuideObj({u:cOff+3*finWidth-inner,side:this.side});
         this[STRIP]=new xGuideObj({u:cOff+stripWidth/2,side:this.side});
-        this[STRIPINNER]=new xGuideObj({u:cOff+stripWidth/2+inner,side:this.side});
-        this[FOLD]=new xGuideObj({u:cOff+finWidth/2,side:this.side});
-        this[FOLDINNER]=new xGuideObj({u:cOff+finWidth/2+inner,side:this.side});
+        this[STRIPINNER]=new xGuideObj({u:cOff+stripWidth/2-inner,side:this.side});
+        this[FOLD]=new xGuideObj({u:cOff+finWidth,side:this.side});
+        this[FOLDINNER]=new xGuideObj({u:cOff+finWidth-inner,side:this.side});
       }
       else if (this.side==CENTER) {
         o[CENTER]=new xGuideObj({u:cOff,side:this.side});
       }
       else console.log("Cannot calculate x guides for side ",this.side);
+      //console.log(this)
       return false;
     }
   };
@@ -202,12 +203,12 @@ function GuideObj(p) {
         index: null,
         ref: null,
         setRaw(iRaw) {
-            this.raw=Math.round(iRaw);
+            this.raw=iRaw;
             this.u=Math.round(params.units.to(iRaw));
         },
         setU(iU) {
             this.u=Math.round(iU);
-            this.raw=Math.round(params.units.from(iU));
+            this.raw=params.units.from(iU);
         },
         setAxis(iAxis) {
             this.axis=iAxis;

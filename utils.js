@@ -1,6 +1,6 @@
 export { unitObj } ; // to be removed -> replace with rawMeas, uMeas
 export { rawMeas, uMeas, units, debug };
-import {units} from '../index.js';
+import {units} from './index.js';
 
 function debug(msg){
     document.body.appendChild(document.createElement("p")).innerHTML+=msg;

@@ -1,5 +1,5 @@
 export {};
-import { params, guides } from '../index.js';
+import { params, guides } from './index.js';
 import {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
@@ -52,11 +52,11 @@ export function vLine(p) {
   //console.log(p);
   if (p.x.u) x=p.x.u;
   //else xC=guides.v[p.x.side][p.x.guide].u;
-  else xC=guides.ax(X).side(p.x.side).ref(p.x.guide).u;
+  else xC=guides.ax(X).side(p.x.SIDE).ref(p.x.REF).u;
   if (p.y1===undefined) y1c=0;
-  else y1c=guides.h[p.y1.index].u;
+  else y1c=guides.ax(Y).index(p.y1.INDEX).u;
   if (p.y2===undefined) y2c=params.page.height.u;
-  else y2c=guides.h[p.y2.index].u;
+  else y2c=guides.ax(Y).index(p.y2.INDEX).u;
 	return line(xC,y1c,xC,y2c);
 }
 
@@ -66,16 +66,13 @@ export function hLine(p) {
   if (p.y===undefined) console.log("Missing required parameter: y");
   //console.log(p);
   if (p.y.u) x=p.y.u;
-  else yC=guides.h[p.y.index].u;
+  else yC=guides.ax(Y).index(p.y.INDEX).u;
   if (p.x1===undefined) x1c=0;
   else {
-    console.log("p.x1:  ",p.x1)
-    console.log("p.x1[SIDE]:  ",p.x1[SIDE])
-    console.log("p.x1.GUIDE:  ",p.x1.GUIDE)
-    x1c=guides.v[p.x1.SIDE][p.x1.GUIDE].u;
+    x1c=guides.ax(X).side(p.x1.SIDE).ref(p.x1.REF).u;
   }
   if (p.x2===undefined) x2c=params.page.width.u;
-  else x2c=guides.v[p.x2.SIDE][p.x2.GUIDE].u;
+  else x2c=guides.ax(X).side(p.x2.SIDE).ref(p.x2.REF).u;
 	return line(x1c,yC,x2c,yC);
 }
 
@@ -107,17 +104,19 @@ export function guideRect(p){
     console.log("Missing one or more required parameters: x1, y1")
   }
   x1=p.x1;
-  y1=p.y1
-  x1computed=guides.ax(X).side(x1.side).ref(x1.guide).u;
-  y1computed=guides.ax(Y).index(y1.index).u;
+  y1=p.y1;
+  x1computed=guides.ax(X).side(x1.SIDE).ref(x1.REF).u;
+  y1computed=guides.ax(Y).index(y1.INDEX).u;
   if (p.x2 && p.y2) {
     x2=p.x2;
     y2=p.y2;
-    wComputed = guides.ax(X).side(x2.side).ref(x2.guide).u-x1computed;
-    hComputed = guides.ax(Y).index(y2.index).u-y1computed;
+    wComputed = guides.ax(X).side(x2.SIDE).ref(x2.REF).u-x1computed;
+    hComputed = guides.ax(Y).index(y2.INDEX).u-y1computed;
   } else if (p.w && p.h) {
-    wComputed=p.w.u;
-    hComputed=p.h.u;
+    if (typeof p.w=="number") wComputed=p.w;
+    else wComputed=p.w.u;
+    if (typeof p.h=="number") hComputed=p.h;
+    else hComputed=p.h.u;
   } else {
     console.log("Missing one or more conditionally required parameters. Must supply either (x2, y2) or (w, h).");
   }
@@ -200,7 +199,7 @@ export function pathCmd(p) {
       }
       else {
         var gId=p[repl];
-        if (repl=="x" || repl=="dx") replComputed=guides.ax(X).side(gId.side).ref(gId.guide).u;
+        if (repl=="x" || repl=="dx") replComputed=guides.ax(X).side(gId.side).ref(gId.ref).u;
         else if (repl=="y" || repl=="dy") replComputed=guides.ax(Y).index(gId.index).u;
         else console.log("Not sure what to do with this. Param not in x, y, dx, dy.")
       }

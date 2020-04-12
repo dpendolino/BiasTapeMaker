@@ -19,5 +19,6 @@ export const SECTIONS=[SLIDE,GUIDE,BASE];
 //OTHER
 export const SIDE="side";
 export const INDEX="index";
+export const REF="ref";
 export const X="x";
 export const Y="y";

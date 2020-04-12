@@ -104,17 +104,20 @@ export function Sections(params) { //section.array -> SLIDE, BASE, GUIDE
     this.SLIDE={
       name:"slide",
       offset:new unitObj(panelWidth.raw-baseWidth.raw),
-      fill:"#F1948A"
+      //fill:"#F1948A"
+      fill: "none"
       };
     this.BASE={
       name:"base",
       offset:panelWidth,
-      fill:"#D4E6F1"
+      //fill:"#D4E6F1"
+      fill: "none"
       };
     this.GUIDE={
       name:"guide",
       offset:new unitObj(panelWidth.raw+baseWidth.raw),
-      fill:"#A2D9CE"
+      //fill:"#A2D9CE"
+      fill: "none"
       };
     this.array=[this.SLIDE,this.BASE,this.GUIDE];
     this.count=this.array.length;
