@@ -1,4 +1,4 @@
-//import {Guides,Sections} from './biasTapeMaker/structure.js';
+const versionNo="0.2";
 import {Sections} from './structure.js';
 import {unitObj,meas} from './utils.js';
 import {svg,group,rect,hLine,vLine,path,guideRect, pathCmdList,text} from './svg.js';
@@ -6,6 +6,7 @@ import {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
   SLIDE,GUIDE,BASE,SECTIONS,
+  FILL,
   SIDE,INDEX,REF,X,Y} from './const.js';
 import {Guides,printUsage} from './guides.js';
 
@@ -37,7 +38,7 @@ stripWidth = new unitObj(1.25);
 finishedWidth = new unitObj(stripWidth.raw/4+.1);
 foldWidth = new unitObj((stripWidth.raw - 2*finishedWidth.raw)/2);
 inner = new unitObj(.02);
-panelWidth= new unitObj(page.width.raw/3-inner.raw);
+panelWidth= new unitObj(page.width.raw/3-2*inner.raw);
 baseWidth= new unitObj(page.width.raw-2*panelWidth.raw);
 var hGuideSep = new unitObj(.25);
 var offset = new unitObj(baseWidth.raw*.5);
@@ -52,7 +53,7 @@ export var params = {
     hGuideSep:hGuideSep,
     offset:offset,
     units:units};
-var slideStart = 5;
+var slideStart = 6;
 var slideEnd = 19;
 var guideEnd = 21;
 var firstTab = 28;
@@ -90,12 +91,14 @@ for (let i=0; i<sections.count; i++) {
       }
     }
   }
+  if (sect.name==BASE) addCircleTabs(groupObj,RIGHT);
+  if (sect.name==SLIDE) addCircleTabs(groupObj,RIGHT);
 }
 
 function drawGuide(parent) {
   topCutout(parent,1);
-  topCutout(parent,2);
-  topCutout(parent,3);
+  topCutout(parent,2.5);
+  topCutout(parent,4);
 
   var d;
   d = pathCmdList([
@@ -123,14 +126,14 @@ function drawGuide(parent) {
   bottomCutout(parent,guideEnd+1,firstTab-guideEnd);
   bottomCutout(parent,firstTab+2,secondTab-firstTab-1);
   
-  bottomCutout(parent,secondTab+2,40.5-secondTab) 
+  bottomCutout(parent,secondTab+2,40-secondTab) 
   bottomCutout(parent,43,.5) 
 }
 drawGuide(svgDrawing.getElementById(GUIDE));
  
 function drawSlide(parent) {
   topCutout(parent,1);
-  topCutout(parent,2);
+  topCutout(parent,2.5);
 
   var d = pathCmdList([
     {cmd:"M",x:{side:LEFT,ref:STRIP},y:{index:slideStart+1}},
@@ -138,14 +141,14 @@ function drawSlide(parent) {
     {cmd:"H",x:{side:LEFT,ref:FOLDOUT}},
     {cmd:"V",y:{index:slideEnd}},
     {cmd:"H",x:{side:LEFT,ref:FOLD}},
-    {cmd:"m",dx:-finishedWidth.u,dy:0},
+    {cmd:"m",dx:-finishedWidth.u-inner.u,dy:0},
     {cmd:"v",dy:-2.1*hGuideSep.u},
     {cmd:"M",x:{side:RIGHT,ref:STRIP},y:{index:slideStart+1}},
     {cmd:"V",y:{index:slideEnd-4}},
     {cmd:"H",x:{side:RIGHT,ref:FOLDOUT}},
     {cmd:"V",y:{index:slideEnd}},
     {cmd:"H",x:{side:RIGHT,ref:FOLD}},
-    {cmd:"m",dx:finishedWidth.u,dy:-4*hGuideSep.u},
+    {cmd:"m",dx:finishedWidth.u+inner.u,dy:-4*hGuideSep.u},
     {cmd:"v",dy:2.1*hGuideSep.u}
   ]);
   
@@ -169,7 +172,7 @@ function drawSlide(parent) {
   
   splitterTabs(parent,firstTab);
   splitterTabs(parent,secondTab);
-  bottomCutout(parent,42,.5) 
+  bottomCutout(parent,41.5,.5) 
   bottomCutout(parent,43,.5) 
 }
 drawSlide(svgDrawing.getElementById(SLIDE));
@@ -187,7 +190,7 @@ function setFoldAttributes(svgObj) {
 function topCutout(parent,yInd) {
   var aRect = guideRect({
     x1:{SIDE:LEFT,REF:STRIP},
-    y1:{INDEX:yInd},
+    y1:yInd*hGuideSep.u,
     w:stripWidth.u,
     h:.5*hGuideSep.u
     });
@@ -199,12 +202,12 @@ function topCutout(parent,yInd) {
 function bottomCutout(parent,yInd,hSepCt) {
   var aRect = guideRect({
     x1:{SIDE:LEFT,REF:FOLD},
-    y1:{INDEX:yInd},
+    y1:yInd*hGuideSep.u,
     w:2*finishedWidth.u,
     h:hSepCt*hGuideSep.u
     });
   setCutAttributes(aRect);
-  aRect.setAttribute("id",parent.name+"-cutout-"+yInd);
+  aRect.setAttribute("id",parent.getAttribute("id")+"-cutout-"+yInd);
   parent.appendChild(aRect);
 }
 
@@ -215,13 +218,13 @@ function splitterTabs(parent,yInd) {
     {cmd:"H",x:{side:LEFT, ref: FOLDOUT}},
     {cmd:"V",y:{index:yInd+1}},
     {cmd:"H",x:{side:LEFT, ref:FOLD}},
-    {cmd:"m",dx:-finishedWidth.u,dy:0},
+    {cmd:"m",dx:-finishedWidth.u-inner.u,dy:0},
     {cmd:"v",dy:hGuideSep.u},
     {cmd:"M",x:{side:RIGHT, ref:FOLD},y:{index:yInd}},
     {cmd:"H",x:{side: RIGHT, ref: FOLDOUT}},
     {cmd:"V",y:{index:yInd+2}},
     {cmd:"H",x:{side:RIGHT, ref: FOLD}},
-    {cmd:"m",dx:finishedWidth.u,dy:0},
+    {cmd:"m",dx:finishedWidth.u+inner.u,dy:0},
     {cmd:"v",dy:-hGuideSep.u}
   ]);
   cutPath = path(d,parent.name+"cut-tabs-"+yInd);
@@ -297,3 +300,25 @@ function addScale(parent) {
   scale.appendChild(scalePath);
 }
 addScale(svgDrawing);
+
+function addCircleTabs(parent,side) {
+  var sweep = (side==RIGHT) ? 0:1;
+  var xLoc = (side==RIGHT) ? baseWidth.u-10:10;
+  var d, tabHeights={1:2,2:12,3:22,4:32,5:42};
+  for (let tab in tabHeights) {
+    d=pathCmdList([
+      {cmd:"M",x:xLoc,y:{index:tabHeights[tab]}},
+      {cmd:"a",rx:20,ry:20,dx:0,dy:40,sweep:sweep}
+    ]);
+    var circTab=path(d)
+    circTab.setAttribute("id",parent.getAttribute("id")+"-tab-"+tab);
+    setCutAttributes(circTab);
+    circTab.setAttribute(FILL,"none");
+    parent.appendChild(circTab);
+  }
+}
+console.log(panelWidth,baseWidth);
+console.log(baseWidth.u-panelWidth.u)
+
+svgDrawing.appendChild(text("BiasTapeMaker v"+versionNo,"version-tag",{x:"50%",y:20,fill:"#000","text-anchor":"middle"}));
+svgDrawing.appendChild(text("Designed by Kendra Pendolino","credits-kpendolino",{x:"50%",y:40,fill:"#000","text-anchor":"middle"}));

@@ -19,6 +19,7 @@ export const SECTIONS=[SLIDE,GUIDE,BASE];
 //SVG ATTRIBUTES
 export const FILL="fill";
 export const STYLE="style";
+export const TEXTANCHOR="text-anchor";
 //OTHER
 export const SIDE="side";
 export const INDEX="index";

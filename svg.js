@@ -4,7 +4,7 @@ import {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
   SLIDE,GUIDE,BASE,SECTIONS,
-  FILL,STYLE,
+  FILL,STYLE,TEXTANCHOR,
   SIDE,INDEX,X,Y} from './const.js';
 
 var NS="http://www.w3.org/2000/svg";
@@ -104,8 +104,10 @@ export function guideRect(p){
   }
   x1=p.x1;
   y1=p.y1;
-  x1computed=guides.ax(X).side(x1.SIDE).ref(x1.REF).u;
-  y1computed=guides.ax(Y).index(y1.INDEX).u;
+  if (typeof x1==="number") x1computed=x1;
+  else x1computed=guides.ax(X).side(x1.SIDE).ref(x1.REF).u;
+  if (typeof y1==="number") y1computed=y1;
+  else y1computed=guides.ax(Y).index(y1.INDEX).u;
   if (p.x2 && p.y2) {
     x2=p.x2;
     y2=p.y2;
@@ -166,8 +168,32 @@ const pathCmds={
   z:{
     cmdType:cmdType.REL,
     cmdString:"z ",
-    cmdReplace:{}}
+    cmdReplace:{}},
+  A:{
+  	cmdType:cmdType.ABS,
+      cmdString:"A {} {} {} {} {} {} {}",
+      cmdReplace:{rx:rt,ry:rt,angle:rt,
+        largeArc:rt, sweep:rt,x:rt,y:rt},
+      cmdDefaults:{angle:0,largeArc:0, sweep:0}},
+  a:{
+  	cmdType:cmdType.REL,
+      cmdString:"a {} {} {} {} {} {} {}",
+      cmdReplace:{rx:rt,ry:rt,angle:rt,
+        largeArc:rt, sweep:rt,dx:rt,dy:rt},
+      cmdDefaults:{angle:0,largeArc:0, sweep:0}}
 };
+
+/*
+A	(rx ry 
+    angle large-arc-flag sweep-flag 
+    x y)+
+a	(rx ry 
+    angle large-arc-flag sweep-flag 
+    dx dy)+
+
+*/
+
+
 
 export function pathCmdList(cmds) {
   var d="";
@@ -182,11 +208,19 @@ export function pathCmd(p) {
   var rStr=cmd["cmdString"];
   const req = cmd["cmdReplace"];
   const type=cmd["cmdType"];
-  for (const repl in req) {
-    if (p[repl]===undefined) console.log("Missing conditionally required parameter. Path command ",p.cmd," requires parameter ",repl,".");
-    var replComputed;
-    //console.log(repl,":  ",p[repl]);
-    if (typeof p[repl]==="number"||typeof p[repl]==="string") replComputed=p[repl];
+  var replComputed;
+    for (const repl in req) {
+    if (p[repl]===undefined) {
+        if (cmd["cmdDefaults"]===undefined
+            ||  cmd["cmdDefaults"][repl]===undefined) {
+                console.log("Missing conditionally required parameter. Path command ",
+                p.cmd," requires parameter ",repl,".");
+                }
+    	else {
+    	    replComputed=cmd["cmdDefaults"][repl];
+    	}
+    }
+    else if (typeof p[repl]==="number"||typeof p[repl]==="string") replComputed=p[repl];
     else if (typeof p[repl]==="object") {
       if (p[repl].u && type==cmdType.REL) {
         //console.log("Provided unit object ",p[repl]," to relative path.");
@@ -215,7 +249,7 @@ export function text(text,id,p) {
   SVGObj.setAttribute("id",id);
   SVGObj.innerHTML=text;
   for (let attr in p) {
-    if (attr==FILL||attr==X||attr==Y||attr==STYLE) {
+    if (attr==FILL||attr==X||attr==Y||attr==STYLE||attr==TEXTANCHOR) {
       SVGObj.setAttribute(attr,p[attr]);
     }
   }
