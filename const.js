@@ -12,7 +12,7 @@ export const STRIPINNER="stripInner";
 export const EDGE="edge";
 export const REFS=[FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,CENTER];
 //SECTIONS
-export const SLIDE="slide";
+export const SLIDE="slide"
 export const GUIDE="guide";
 export const BASE="base";
 export const SECTIONS=[SLIDE,GUIDE,BASE];

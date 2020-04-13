@@ -1,11 +1,6 @@
-import {LEFT,RIGHT,CENTER} from './const.js';
-import {FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER} from './const.js';
-//import {LEFT,RIGHT,CENTER} from './const.js';
-import { params } from './index.js';
-
-const X="x";
-const Y="y";
-export var printUsage={on:true};
+import {LEFT,RIGHT,CENTER,
+    FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,
+    X,Y, params, printUsage} from './index.js';
 
 export function Guides() {
   if (printUsage.on && !printUsage.Guides) {
@@ -148,36 +143,6 @@ function xGuideSide(side) {
   else return false;
   return o;
 }
-/*
-usage examples
-
-Guides.calculate()
-  -> xGuides.calculate()
-    -> xGuidesSide.calculate()
-      -> set each guide
-  -> yGuides.calculate()
-    -> set each guide
-
-Guides.x.side(SIDE).ref(REF) -> GuideObj
-Guides.x -> xGuides
-  xGuides.side(SIDE) -> xGuideSide
-    xGuideSide.ref(REF) -> xGuideObj
-    
-Guides.y.ind(INDEX) -> GuideObj
-Guides.y -> yGuides
-  yGuides.ind(INDEX) -> yGuideObj
-  
-GuideObj.u -> meas in px
-GuideObj.raw -> meas in decimal units
-GuideObj.below(unitObj) -> new GuideObj relative
-        .above(unitObj)
-        .left(unitObj)
-        .right(unitObj)
-        .inset()
-        .outset()
-
-*/
-
 function GuideObj(p) {
   if (printUsage.on && !printUsage.GuideObj) {
     console.log("--USAGE: GuideObj()--",
@@ -245,20 +210,35 @@ function GuideObj(p) {
         }
     }
     //if (def) console.log("todo: write arg handling for GuideObj constructor");
-    if (p.u) {
+    var handled={};
+    if (p.u!==undefined) {
       o.setU(p.u);
       delete p.u;
       delete p.raw;
+      handled["u"]=true;
+      handled["raw"]=true;
     }
-    else if (p.raw) {
+    else if (p.raw!==undefined) {
       o.setRaw(p.raw);
       delete p.raw;
+      handled["raw"]=true;
     }
-    if (p.index) {
+    if (p.index!==undefined) {
       if (this.axis==Y) this.index=p.index;
       else delete p.index;
+      handled["index"]=true;
     }
-    for (var arg in p) console.log("Unhandled parameter at GuideObj: ",arg,p[arg]);
+    for (var arg in p) {
+      if (handled[arg]) continue;
+      if (p[arg]===undefined) continue;
+      console.log("handled",handled);
+      console.log("arg in p:",p,p[arg]);
+      try {
+      console.error("Unhandled parameter at GuideObj: ",p,arg,p[arg]);
+      throw "Unhandled parameter";
+      } catch (err) {
+        console.trace();
+      }}
     return o;
 }
 function xGuideObj(p) {
@@ -289,14 +269,3 @@ function yGuideObj(p) {
     delete o.ref;
     return o;
 }
-
-//var obj=new Guides();
-//console.log("obj: ",obj);
-//console.log("obj.ax(X): ",obj.ax(X));
-//console.log("obj.ax(X).side(LEFT): ",obj.ax(X).side(LEFT));
-//console.log("obj.ax(X).side(LEFT).ref(FOLD): ",obj.ax(X).side(LEFT).ref(FOLD));
-//console.log("obj.ax(Y)",obj.ax(Y));
-//console.log("obj.ax(Y).index(32)",obj.ax(Y).index(32));
-//console.log("obj.ax(Y).index(obj.maxIndex))",obj.ax(Y).index(obj.maxIndex));
-//console.log(obj.ax(Y).maxIndex)
-//console.log("obj.ax(Y).index(44)",obj.ax(Y).index(44));
