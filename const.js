@@ -20,6 +20,7 @@ export const SECTIONS=[SLIDE,GUIDE,BASE];
 export const FILL="fill";
 export const STYLE="style";
 export const TEXTANCHOR="text-anchor";
+export const FILLOPACITY="fill-opacity";
 //OTHER
 export const SIDE="side";
 export const INDEX="index";

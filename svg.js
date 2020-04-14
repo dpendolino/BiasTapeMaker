@@ -230,7 +230,8 @@ function text(text,id,p) {
 function setSvgAttributes(svgObj,type) {
   var styles;
   if (type=="cut") styles=style.cut;
-  else if (type=="cutout") styles=style.cut;
+  else if (type=="cutout") styles=style.cutout;
   else if (type=="fold") styles=style.fold;
+  else if (type=="reinforce") styles=style.reinforce;
   for (let attr in styles) svgObj.setAttribute(attr,styles[attr]);
 }

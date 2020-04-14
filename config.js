@@ -5,7 +5,7 @@ var params, page, stripWidth, finishedWidth,
     foldWidth, inner, tapeType, slideLength,
     panelWidth, baseWidth, units,
     hGuideSep, offset, slideStart, slideEnd,
-    guideEnd, firstTab, secondTab;
+    guideEnd, firstTab, miniGuide1, miniGuide2;
 units={
   x:100,
   label:"inch",
@@ -22,15 +22,16 @@ stripWidth = new unitObj(1.25);
 finishedWidth = new unitObj(stripWidth.raw/4+.1);
 foldWidth = new unitObj((stripWidth.raw - 2*finishedWidth.raw)/2);
 inner = new unitObj(.02);
-panelWidth= new unitObj(page.width.raw/3-2*inner.raw);
+panelWidth= new unitObj(page.width.raw/3-3*inner.raw);
 baseWidth= new unitObj(page.width.raw-2*panelWidth.raw);
 hGuideSep = new unitObj(.25);
 offset = new unitObj(baseWidth.raw*.5);
 slideStart = 6;
-slideEnd = 19;
-guideEnd = 21;
-firstTab = 28;
-secondTab = 35;
+slideEnd = 22;
+guideEnd = slideEnd;
+firstTab = guideEnd+9;
+miniGuide1 = slideEnd+1;
+miniGuide2 = firstTab+3;
 params = {
   page:page,
   stripWidth:stripWidth,
@@ -46,7 +47,8 @@ params = {
   slideEnd:slideEnd,
   guideEnd:guideEnd,
   firstTab:firstTab,
-  secondTab:secondTab};
+  miniGuide1:miniGuide1,
+  miniGuide2:miniGuide2};
 
 var printUsage={on:false};
 var sectionConfig={
@@ -95,5 +97,11 @@ var style={
   },
   guide:{
     stroke:"#eee"
+  },
+  reinforce:{
+    "fill":"#008",
+    "fill-opacity":"10%",
+    "stroke":"#008",
+    "stroke-dasharray":"4,2"
   }
 };

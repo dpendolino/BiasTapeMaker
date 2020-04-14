@@ -1,4 +1,4 @@
-const versionNo="0.2";
+const versionNo="0.4";
 
 import {unitObj,meas} from './utils.js';
 export {unitObj,meas};
@@ -8,13 +8,13 @@ import {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
   SLIDE,GUIDE,BASE,SECTIONS,
-  FILL,STYLE,TEXTANCHOR,
+  FILL,STYLE,TEXTANCHOR,FILLOPACITY,
   SIDE,INDEX,REF,X,Y} from './const.js';
 export {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
   SLIDE,GUIDE,BASE,SECTIONS,
-  FILL,STYLE,TEXTANCHOR,
+  FILL,STYLE,TEXTANCHOR,FILLOPACITY,
   SIDE,INDEX,REF,X,Y};
 import {Guides} from './guides.js';
 export {guides}
@@ -40,7 +40,7 @@ for (let sectI in SECTIONS) {
 
   var frame = rect(0,0,params.baseWidth.u,params.page.height.u,sectConfig.fill);
   frame.setAttribute("id",sect.name+"-frame")
-  if (sect.name==BASE) setFoldAttributes(frame);
+  if (sect==BASE) setSvgAttributes(frame,"fold");
   groupObj.appendChild(frame);
 
   for (const i in SIDES) {
@@ -55,12 +55,15 @@ for (let sectI in SECTIONS) {
       }
     }
   }
-  if (sect.name==BASE) addCircleTabs(groupObj,RIGHT);
-  if (sect.name==SLIDE) addCircleTabs(groupObj,RIGHT);
+  if (sect==BASE) addCircleTabs(groupObj,RIGHT);
+  if (sect==SLIDE) addCircleTabs(groupObj,RIGHT);
 }
 
 drawGuide(svgDrawing.getElementById(GUIDE));
 drawSlide(svgDrawing.getElementById(SLIDE));
  
-svgDrawing.appendChild(text("BiasTapeMaker v"+versionNo,"version-tag",{x:"50%",y:20,fill:"#000","text-anchor":"middle"}));
-svgDrawing.appendChild(text("Designed by Kendra Pendolino","credits-kpendolino",{x:"50%",y:40,fill:"#000","text-anchor":"middle"}));
+var hGuideSep=params.hGuideSep;
+svgDrawing.appendChild(text("BiasTapeMaker v"+versionNo,"version-tag",{x:"50%",y:5*hGuideSep.u,fill:"#000","text-anchor":"middle"}));
+svgDrawing.appendChild(text("Designed by Kendra Pendolino","credits-kpendolino",{x:"50%",y:6*hGuideSep.u,fill:"#000","text-anchor":"middle"}));
+svgDrawing.appendChild(text("For "+params.stripWidth.raw+" inch wide strips","strip-width",{x:"50%",y:7*hGuideSep.u,fill:"#000","text-anchor":"middle"}));
+svgDrawing.appendChild(text("Makes "+params.finishedWidth.raw+" inch double-fold","finished-width",{x:"50%",y:8*hGuideSep.u,fill:"#000","text-anchor":"middle"}));
