@@ -149,6 +149,7 @@ function wallTabSlots() {
   var hGuideSep=params.hGuideSep;
   var miniGuide1=params.miniGuide1;
   var miniGuide2=params.miniGuide2;
+  var inner=params.inner;
   var d;
   function wallx() {
       var wallx={slot:{
@@ -164,20 +165,23 @@ function wallTabSlots() {
       return wally;
   }
   const WALLY= wally();
-  const SLOT={cmd:"v",dy:1.4*hGuideSep.u};
+  const SLOT1={cmd:"v",dy:1.4*hGuideSep.u};
+  const SLOT2={cmd:"h",dx:2*inner.u};
+  const SLOT3={cmd:"v",dy:-1.4*hGuideSep.u};
+  const SLOT4={cmd:"z"};
 
   d = pathCmdList([
     // First wall tab
     {cmd:"M",x:WALLX["slot"]["left"],y:WALLY[1]["topleft"]},
-    SLOT,
+    SLOT1,SLOT2,SLOT3,SLOT4,
     {cmd:"M",x:WALLX["slot"]["right"],y:WALLY[1]["topright"]},
-    SLOT,
+    SLOT1,SLOT2,SLOT3,SLOT4,
     {cmd:"M",x:WALLX["slot"]["left"],y:WALLY[2]["topleft"]},
-    SLOT,
+    SLOT1,SLOT2,SLOT3,SLOT4,
     {cmd:"M",x:WALLX["slot"]["right"],y:WALLY[2]["topright"]},
-    SLOT
+    SLOT1,SLOT2,SLOT3,SLOT4
   ]);
   var dPath = path(d,GUIDE+"-wall-tab-slots");
-  setSvgAttributes(dPath,"cut");
+  setSvgAttributes(dPath,"cutout");
   return dPath;
 }
