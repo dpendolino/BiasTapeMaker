@@ -21,6 +21,15 @@ export const FILL="fill";
 export const STYLE="style";
 export const TEXTANCHOR="text-anchor";
 export const FILLOPACITY="fill-opacity";
+export const ID="id";
+export const STROKE="stroke";
+export const SVGATTRS=[FILL,STYLE,TEXTANCHOR,FILLOPACITY,ID,STROKE];
+//STYLE TYPES
+export const CUT="cut";
+export const CUTOUT="cutout";
+export const REINFORCE="reinforce";
+export const FRAME="frame";
+export const STYLETYPES=[CUT,CUTOUT,FOLD,REINFORCE,FRAME];
 //OTHER
 export const SIDE="side";
 export const INDEX="index";

@@ -2,19 +2,23 @@ const versionNo="0.4";
 
 import {unitObj,meas} from './utils.js';
 export {unitObj,meas};
-import {svg,group,rect,hLine,vLine,path,guideRect, pathCmdList,text,setSvgAttributes} from './svg.js';
-export{path,pathCmdList,guideRect,setSvgAttributes,group,rect,text};
+import {svg,group,
+  hLine,vLine,path,
+  pathCmdList,text,setSvgAttributes,svgRect} from './svg.js';
+export{path,pathCmdList,setSvgAttributes,group,text,svgRect};
 import {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
   SLIDE,GUIDE,BASE,SECTIONS,
-  FILL,STYLE,TEXTANCHOR,FILLOPACITY,
+  FILL,STYLE,TEXTANCHOR,FILLOPACITY,SVGATTRS,
+  STYLETYPES,CUTOUT,CUT,REINFORCE,FRAME,
   SIDE,INDEX,REF,X,Y} from './const.js';
 export {
   LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
   SLIDE,GUIDE,BASE,SECTIONS,
-  FILL,STYLE,TEXTANCHOR,FILLOPACITY,
+  FILL,STYLE,TEXTANCHOR,FILLOPACITY,SVGATTRS,
+  STYLETYPES,CUTOUT,CUT,REINFORCE,FRAME,
   SIDE,INDEX,REF,X,Y};
 import {Guides} from './guides.js';
 export {guides}
@@ -38,8 +42,7 @@ for (let sectI in SECTIONS) {
   groupObj.setAttribute("transform","translate("+sectConfig.offset.u+" "+0+")");
   svgDrawing.appendChild(groupObj);
 
-  var frame = rect(0,0,params.baseWidth.u,params.page.height.u,sectConfig.fill);
-  frame.setAttribute("id",sect.name+"-frame")
+  var frame = svgRect({x1:0,y1:0,width:params.baseWidth.u,height:params.page.height.u,id:sect+"-frame",styletype:FRAME});
   if (sect==BASE) setSvgAttributes(frame,"fold");
   groupObj.appendChild(frame);
 
@@ -67,3 +70,5 @@ svgDrawing.appendChild(text("BiasTapeMaker v"+versionNo,"version-tag",{x:"50%",y
 svgDrawing.appendChild(text("Designed by Kendra Pendolino","credits-kpendolino",{x:"50%",y:6*hGuideSep.u,fill:"#000","text-anchor":"middle"}));
 svgDrawing.appendChild(text("For "+params.stripWidth.raw+" inch wide strips","strip-width",{x:"50%",y:7*hGuideSep.u,fill:"#000","text-anchor":"middle"}));
 svgDrawing.appendChild(text("Makes "+params.finishedWidth.raw+" inch double-fold","finished-width",{x:"50%",y:8*hGuideSep.u,fill:"#000","text-anchor":"middle"}));
+
+svgRect({x1:{SIDE:LEFT,REF:FOLD},y1:100,x2:10,y2:40,id:"test-svg-rect",styletype:CUTOUT});

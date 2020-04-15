@@ -1,22 +1,23 @@
 export {
   //pathCmd,
   svg,
-  rect,
   line,
   vLine,
   hLine,
   group,
   path,
-  guideRect,
   pathCmdList,
   text,
-  setSvgAttributes};
+  setSvgAttributes,
+  svgRect};
 
-import { params, guides,LEFT,RIGHT,CENTER,SIDES,
+import { params, guides,style,
+  LEFT,RIGHT,CENTER,SIDES,
   FOLD,FOLDINNER,FOLDOUT,STRIP,STRIPINNER,EDGE,REFS,
   SLIDE,GUIDE,BASE,SECTIONS,
   FILL,STYLE,TEXTANCHOR,
-  SIDE,INDEX,X,Y,style } from './index.js';
+  SIDE,INDEX,X,Y,SVGATTRS 
+  } from './index.js';
 
 var NS="http://www.w3.org/2000/svg";
 const svgElem = {
@@ -87,20 +88,44 @@ function svg(w,h){
  svg.setAttribute("height",h);
  return svg;
 }
-function rect(x,y,w,h,fill){
-   try {
-       var SVGObj= document.createElementNS(NS,svgElem.RECT);
-       SVGObj.width.baseVal.value=Math.round(w);
-       SVGObj.height.baseVal.value=h;
-       SVGObj.setAttribute("x",x);
-       SVGObj.setAttribute("y",y);
-       SVGObj.style.fill=fill;
-       return SVGObj;
-    } catch (err) {
-    	console.log("rect("+x+", "+y+","+w+","+h+")");
-      console.trace();
-      console.error(err);
+function logError(s) {
+  console.log(s);
+  console.trace();
+}
+function svgRect(p) {
+  const req = {x1:true,y1:true,id:true,oneof:[["x2","width"],["y2","height"]]}
+  checkRequired(p,req)
+  var SVGObj= document.createElementNS(NS,svgElem.RECT);
+  var computed={}
+  for (const attr in p) {
+    if (attr=="x1"||attr=="x2") computed[attr]=processUnits(p[attr],X)
+    else if (attr=="y1"||attr=="y2") computed[attr]=processUnits(p[attr],Y)
+    else if (attr=="width"||attr=="height") computed[attr]=processUnits(p[attr])
+  }
+  if (computed.x2!==undefined) {
+    computed.x = Math.min(computed.x1,computed.x2);
+    computed.width = Math.abs(computed.x1-computed.x2)
+  }
+  else computed.x = computed.x1; 
+  delete computed.x1;
+  delete computed.x2;
+  if (computed.y2!==undefined) {
+    computed.y = Math.min(computed.y1,computed.y2);
+    computed.height = Math.abs(computed.y1-computed.y2)
+  }
+  else computed.y = computed.y1; 
+  delete computed.y1;
+  delete computed.y2;
+  const posSize=["x","y","width","height"];
+  for (const i in posSize) SVGObj.setAttribute(posSize[i],computed[posSize[i]])
+  if (p.styletype!==undefined) setSvgAttributes(SVGObj,p.styletype);
+  for (const i in SVGATTRS) {
+    const attr=SVGATTRS[i];
+    if (p[attr]!==undefined) {
+      SVGObj.setAttribute(attr,p[attr])
     }
+  }
+  return SVGObj;
 }
 function line(x1,y1,x2,y2,stroke) {
  var SVGObj= document.createElementNS(NS,svgElem.LINE);
@@ -145,29 +170,6 @@ function path(d,name) {
     this.d+=pathCommands;
   }
   return SVGObj;
-}
-function guideRect(p){
-  var x1, y1, x2, y2, w, h, fill;
-  var x1computed, y1computed, wComputed, hComputed;
-  if (p.x1===undefined || p.y1===undefined) console.log("Missing one or more required parameters: x1, y1")
-  x1=p.x1;
-  y1=p.y1;
-  if (typeof x1==="number") x1computed=x1;
-  else x1computed=guides.ax(X).side(x1.SIDE).ref(x1.REF).u;
-  if (typeof y1==="number") y1computed=y1;
-  else y1computed=guides.ax(Y).index(y1.INDEX).u;
-  if (p.x2 && p.y2) {
-    x2=p.x2;
-    y2=p.y2;
-    wComputed = guides.ax(X).side(x2.SIDE).ref(x2.REF).u-x1computed;
-    hComputed = guides.ax(Y).index(y2.INDEX).u-y1computed;
-  } else if (p.w && p.h) {
-    if (typeof p.w=="number") wComputed=p.w;
-    else wComputed=p.w.u;
-    if (typeof p.h=="number") hComputed=p.h;
-    else hComputed=p.h.u;
-  } else console.log("Missing one or more conditionally required parameters. Must supply either (x2, y2) or (w, h).");
-  return rect(x1computed,y1computed,wComputed,hComputed,fill);
 }
 function pathCmdList(cmds) {
   var d="";
@@ -233,5 +235,34 @@ function setSvgAttributes(svgObj,type) {
   else if (type=="cutout") styles=style.cutout;
   else if (type=="fold") styles=style.fold;
   else if (type=="reinforce") styles=style.reinforce;
+  else if (type=="frame") styles=style.frame;
   for (let attr in styles) svgObj.setAttribute(attr,styles[attr]);
+}
+
+function processUnits(measurement,axis) {
+  var computed;
+  if (typeof measurement=="number") computed=measurement;
+  else if (measurement.u!==undefined) computed=measurement.u;
+  else if (axis==X 
+    && measurement.SIDE!==undefined 
+    && measurement.REF!==undefined) computed=guides.ax(X).side(measurement.SIDE).ref(measurement.REF).u;
+  else if (axis==Y && measurement.INDEX!==undefined) computed=guides.ax(Y).index(measurement.INDEX).u;
+  else {
+    console.log(measurement)
+    logError("this doesn't look like a number, a unit object, or a guide id - don't know what to do with it.")
+    return false;
+  }
+  return computed;
+}
+
+function checkRequired(p,req) {
+  for (const item in req) if (req[item]===true && p[item]===undefined) logError(item+" is required.")
+  for (let i in req.oneof) {
+    let oneof=req.oneof[i];
+    let found=0;
+    for (let j in oneof) {
+      if (p[oneof[j]]!==undefined) found++;
+    }
+    if (found!=1) logError("exactly one of "+oneof+" is required.")
+  }
 }

@@ -1,30 +1,29 @@
-import {params,guideRect,
-  LEFT,STRIP,FOLD,FOLDOUT,RIGHT,X,
-  path,setSvgAttributes,pathCmdList,guides} from './index.js';
+import {params,
+  LEFT,STRIP,FOLD,FOLDOUT,RIGHT,X,CUTOUT,
+  path,setSvgAttributes,pathCmdList,guides,svgRect} from './index.js';
 export {topCutout,bottomCutout,splitterTabs,addCircleTabs};
 
 function topCutout(parent,yInd) {
-  var aRect = guideRect({
+  var aRect = svgRect({
     x1:{SIDE:LEFT,REF:STRIP},
     y1:yInd*params.hGuideSep.u,
-    w:params.stripWidth.u,
-    h:.7*params.hGuideSep.u
+    width:params.stripWidth.u,
+    height:.7*params.hGuideSep.u,
+    styletype:CUTOUT,
+    id:parent.getAttribute("id")+"-cutout-"+yInd
     });
-  //setCutAttributes(aRect);
-  setSvgAttributes(aRect,"cutout");
-  aRect.setAttribute("id",parent.name+"-cutout-"+yInd);
-  parent.appendChild(aRect);
+  parent.appendChild(aRect)
 }
 function bottomCutout(parent,yInd,hSepCt) {
   var finishedWidth=params.finishedWidth;
-  var aRect = guideRect({
+  var aRect = svgRect({
     x1:{SIDE:LEFT,REF:FOLD},
     y1:yInd*params.hGuideSep.u,
-    w:2*finishedWidth.u,
-    h:hSepCt*params.hGuideSep.u
-    });
-  setSvgAttributes(aRect,"cutout");
-  aRect.setAttribute("id",parent.getAttribute("id")+"-cutout-"+yInd);
+    width:2*finishedWidth.u,
+    height:hSepCt*params.hGuideSep.u,
+    styletype:CUTOUT,
+    id:parent.getAttribute("id")+"-cutout-"+yInd
+  });
   parent.appendChild(aRect);
 }
 function splitterTabs(parent,yInd,isSlideEnd) {

@@ -56,19 +56,19 @@ var sectionConfig={
     name:"slide",
     offset:new unitObj(params.panelWidth.raw-params.baseWidth.raw),
     //fill:"#F1948A"
-    fill: "none"
+    FILL: "none"
   },
   GUIDE:{
     name:"guide",
     offset:new unitObj(params.panelWidth.raw+params.baseWidth.raw),
     //fill:"#A2D9CE"
-    fill: "none"
+    FILL: "none"
   },
   BASE:{
     name:"base",
     offset:params.panelWidth,
     //fill:"#D4E6F1"
-    fill: "none"
+    FILL: "none"
   },
   get(sect) {
     if (sect==SLIDE) return this.SLIDE;
@@ -103,5 +103,9 @@ var style={
     "fill-opacity":"10%",
     "stroke":"#008",
     "stroke-dasharray":"4,2"
+  },
+  frame:{
+    "fill":"none",
+    "stroke":"none"
   }
 };
